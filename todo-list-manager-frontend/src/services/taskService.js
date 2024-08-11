@@ -17,3 +17,5 @@ export const updateTask = (task) => {
 export const deleteTask = (id) => {
   return axios.delete(`${API_URL}/${id}`);
 };
+
+export const undoDeleteTask = (id) => axios.post(`${API_URL}/undo/${id}`);

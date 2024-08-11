@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { getTasks, deleteTask, updateTask } from '../services/taskService';
+import { getTasks, deleteTask, updateTask, undoDeleteTask } from '../services/taskService';
 import TaskFilter from './TaskFilter';
 
 function TaskList() {
   const [tasks, setTasks] = useState([]);
+  const [deletedTask, setDeletedTask] = useState(null);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
@@ -16,9 +17,27 @@ function TaskList() {
   };
 
   const handleDelete = async (id) => {
-    await deleteTask(id);
-    setTasks(tasks.filter(task => task._id !== id));
+    try {
+      const response = await deleteTask(id);
+      setDeletedTask(response.data.task); // Store the deleted task
+      setTasks(tasks.filter(task => task._id !== id)); // Update the state to remove the deleted task
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
   };
+
+  const handleUndo = async () => {
+    if (deletedTask) {
+      try {
+        await undoDeleteTask(deletedTask._id); // Restore the deleted task
+        setDeletedTask(null); // Clear the deleted task state
+        fetchTasks(); // Refresh the task list
+      } catch (error) {
+        console.error('Error restoring task:', error);
+      }
+    }
+  };
+
 
   const handleToggleComplete = async (task) => {
     task.status = task.status === 'pending' ? 'completed' : 'pending';
@@ -50,6 +69,11 @@ function TaskList() {
             </li>
           ))}
         </ul>
+      )}
+       {deletedTask && (
+        <div className="alert alert-warning">
+          Task deleted. <button onClick={handleUndo} className="btn btn-link">Undo</button>
+        </div>
       )}
     </div>
   );

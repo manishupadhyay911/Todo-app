@@ -36,15 +36,29 @@ router.patch('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-      const task = await Task.findByIdAndDelete(req.params.id);
+      const task = await Task.findByIdAndUpdate(req.params.id, { deleted: true }, { new: true });
       if (!task) {
         return res.status(404).json({ message: 'Task not found' });
       }
-      res.json({ message: 'Task deleted successfully' });
+      res.json({ message: 'Task deleted successfully', task });
     } catch (error) {
       console.error('Error deleting task:', error);
       res.status(500).json({ message: 'Server error' });
     }
   });
+
+  router.post('/undo/:id', async (req, res) => {
+    try {
+      const task = await Task.findByIdAndUpdate(req.params.id, { deleted: false }, { new: true });
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found or already restored' });
+      }
+      res.json({ message: 'Task restored successfully', task });
+    } catch (error) {
+      console.error('Error restoring task:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
 
 module.exports = router;
