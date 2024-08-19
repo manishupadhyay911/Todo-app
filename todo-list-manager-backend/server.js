@@ -1,24 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const morgan = require('morgan');
 const cors = require('cors');
-const dotenv = require('dotenv');
-
-dotenv.config();
+const bodyParser = require('body-parser');
+const taskRoutes = require('./routes/taskRoutes');
+const { errorHandler } = require('./utils/errorHandler');
+const logger = require('./utils/logger');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(morgan('dev'));
+mongoose.connect('mongodb://localhost:27017/todoDB', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => logger.info('Connected to MongoDB'))
+  .catch(err => logger.error('MongoDB connection error:', err));
+
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected'))
-    .catch((err) => console.error(err));
+app.use('/api/tasks', taskRoutes);
 
-app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
 });

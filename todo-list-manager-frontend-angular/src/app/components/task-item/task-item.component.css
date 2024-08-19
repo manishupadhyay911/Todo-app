@@ -1,0 +1,14 @@
+/* Pending tasks - light background */
+.bg-light {
+    background-color: #f8f9fa !important;
+  }
+  
+  /* Completed tasks - green background with white text */
+  .bg-success {
+    background-color: #28a745 !important;
+  }
+  
+  .bg-success.text-white {
+    color: #fff !important;
+  }
+  

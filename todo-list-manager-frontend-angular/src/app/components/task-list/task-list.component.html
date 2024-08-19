@@ -1,0 +1,35 @@
+<div class="container mt-5">
+    <div class="row">
+      <div class="col-md-12">
+        <form (ngSubmit)="onSubmit()" #taskForm="ngForm" class="mb-4">
+          <div class="mb-3">
+            <input type="text" class="form-control" id="description" name="description" placeholder="Task Description" [(ngModel)]="newTask.description" required>
+          </div>
+          <div class="mb-3">
+            <input type="date" class="form-control" id="dueDate" name="dueDate" [(ngModel)]="newTask.dueDate">
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="tags" name="tags" placeholder="Tags (optional)" [(ngModel)]="newTask.tags">
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="taskForm.invalid">Add Task</button>
+          <button type="button" class="btn btn-secondary ms-2" (click)="onUndo()" [disabled]="!canUndo()">Undo</button>
+          <button type="button" class="btn btn-secondary ms-2" (click)="onRedo()" [disabled]="!canRedo()">Redo</button>
+        </form>
+  
+        <div class="mb-4">
+          <button class="btn btn-outline-primary" (click)="onFilterChange('all')">All</button>
+          <button class="btn btn-outline-secondary" (click)="onFilterChange('pending')">Pending</button>
+          <button class="btn btn-outline-success" (click)="onFilterChange('completed')">Completed</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col-md-12">
+        <div *ngFor="let task of tasks">
+          <app-task-item [task]="task" (taskUpdated)="getTasks()"></app-task-item>
+        </div>
+      </div>
+    </div>
+  </div>
+  
